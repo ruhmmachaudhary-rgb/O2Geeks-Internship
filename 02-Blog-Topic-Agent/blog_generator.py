@@ -6,7 +6,7 @@ from prompts import extract_topics_prompt, blog_prompt
 from company_analyzer import analyze_company
 
 # ---------------- Load CSS ---------------- #
-
+st.title("RUHMMA BLOG GENERATOR")
 def load_css():
 
     with open("styles.css") as file:
@@ -48,158 +48,6 @@ def create_zip():
 
     return zip_path
 
-
-# ---------------- Page Config ---------------- #
-
-st.set_page_config(
-    page_title="AI Blog Generator Agent",
-    page_icon="🤖",
-    layout="wide"
-)
-load_css()
-
-# ---------------- Header ---------------- #
-# ---------------- Hero Section ---------------- #
-
-st.markdown("""
-<div class="hero">
-
-    <h1>Local AI Blog Generator</h1>
-
-    <p>
-        Generate professional SEO blogs using local AI models.
-        Fast, secure and completely private.
-    </p>
-
-</div>
-""", unsafe_allow_html=True)
-# ---------------- Company Input ---------------- #
-
-st.markdown(
-    '<h3 class="section-title">Company Name</h3>',
-    unsafe_allow_html=True
-)
-
-company = st.text_input(
-    label="",
-    placeholder="Enter your company name...",
-    label_visibility="collapsed"
-)
-# ---------------- Generate Blogs ---------------- #
-
-generate_btn = st.button(
-    "Generate Blogs",
-    use_container_width=True
-)
-
-if generate_btn:
-
-    if company.strip() == "":
-        st.warning("⚠ Please enter a company name.")
-        st.stop()
-    # ---------------- Company Analysis ---------------- #
-
-    with st.spinner("🔍 Analyzing Company..."):
-
-        company_info = analyze_company(company)
-
-    st.success("✅ Company Analysis Completed")
-
-    with st.expander("🏢 Company Analysis", expanded=False):
-
-        st.write(company_info)
-
-    st.divider()
-    # Generate Topics
-    with st.spinner("🤖 Generating Trending Topics..."):
-        topics = generate(extract_topics_prompt(company))
-
-    topic_list = [topic.strip() for topic in topics.split("\n") if topic.strip()]
-
-    st.success("✅ Topics Generated Successfully!")
-
-    # ---------------- Dashboard Metrics ---------------- #
-
-    col1, col2, col3 = st.columns(3)
-
-    with col1:
-        st.metric(
-            label="📚 Topics Generated",
-            value=len(topic_list)
-        )
-
-    with col2:
-        st.metric(
-            label="📝 Blogs Generated",
-            value=len(topic_list)
-        )
-
-    with col3:
-        st.metric(
-            label="🤖 AI Model",
-            value="Gemma3:1b"
-        )
-
-    # ---------------- Topic Cards ---------------- #
-
-    st.markdown(
-    '<h2 class="section-heading">Suggested Topics</h2>',
-    unsafe_allow_html=True
-)
-
-    for i, topic in enumerate(topic_list, start=1):
-
-     st.markdown(
-        f"""
-        <div class="topic-card">
-            <span>{i:02}</span>
-            {topic}
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-    st.divider()
-
-    # ---------------- Blog Generation ---------------- #
-
-    st.markdown(
-    '<h2 class="section-heading">Generated Blogs</h2>',
-    unsafe_allow_html=True
-)
-
-    count = 1
-
-    for topic in topic_list:
-
-        with st.spinner(f"✍ Writing blog for '{topic}'..."):
-
-            blog = generate(blog_prompt(topic))
-
-        filepath = save_blog(f"blog{count}.txt", blog)
-        display_blog(
-            title=topic,
-            blog=blog,
-            filepath=filepath,
-            key=f"download_{count}"
-            )
-
-        count += 1
-
-    st.success("🎉 All blogs generated and saved successfully!")
-
-    # ---------------- Download ZIP ---------------- #
-
-    zip_path = create_zip()
-
-    with open(zip_path, "rb") as file:
-
-        st.download_button(
-            label="📦 Download All Blogs (ZIP)",
-            data=file,
-            file_name="AI_Blogs.zip",
-            mime="application/zip",
-            use_container_width=True
-        )
 def display_blog(title, blog, filepath, key):
 
     st.markdown(f"""
@@ -224,3 +72,225 @@ def display_blog(title, blog, filepath, key):
             key=key,
             use_container_width=True
         )
+# ---------------- Page Config ---------------- #
+
+st.set_page_config(
+    page_title="AI Blog Generator Agent",
+    page_icon="🤖",
+    layout="wide"
+)
+load_css()
+# ---------------- Sidebar ---------------- #
+
+with st.sidebar:
+
+    st.markdown("## AI Blog Generator")
+
+    st.markdown("---")
+
+    st.markdown("""
+### Technology Stack
+
+- Python
+- Streamlit
+- Ollama
+- Gemma3
+- Local LLM
+""")
+
+    st.markdown("---")
+
+    st.markdown("""
+### Development Status
+
+✅ Company Analysis
+
+✅ Topic Generator
+
+✅ Blog Generation
+
+✅ Auto Save
+
+✅ ZIP Download
+
+🚧 FastAPI
+
+🚧 React Frontend
+""")
+
+# # ---------------- Hero Section ---------------- #
+# st.markdown("""
+# <div class="hero">
+#     <div class="hero-badge">
+#         AI CONTENT AUTOMATION PLATFORM
+#     </div>
+
+#     <h1>
+#         Generate Professional SEO Blogs<br>
+#         Using Local AI
+#     </h1>
+
+#     <p>
+#         Build high-quality SEO content using Ollama and Gemma locally.
+#         Fast, private, secure, and designed for real-world AI workflows.
+#     </p>
+# </div>
+# """, unsafe_allow_html=True)
+# st.write("BLOG GENERATOR TEST")
+# # ---------------- Feature Cards ---------------- #
+# st.markdown("""
+# <div class="feature-grid">
+
+#     <div class="feature-card">
+#         <h3>Local AI</h3>
+#         <p>Generate content completely offline using Ollama and Gemma.</p>
+#     </div>
+
+#     <div class="feature-card">
+#         <h3>SEO Optimized</h3>
+#         <p>Create structured blogs optimized for search engines.</p>
+#     </div>
+
+# </div>
+# """, unsafe_allow_html=True)
+# ---------------- Company Input ---------------- #
+
+st.markdown("""
+<div class="input-section">
+
+<h2>Start Your Blog Generation</h2>
+
+<p>
+Enter your company name to generate AI-powered SEO blog topics and professional blog articles.
+</p>
+
+</div>
+""", unsafe_allow_html=True)
+
+st.markdown(
+    '<div class="section-title">Company Name</div>',
+    unsafe_allow_html=True
+)
+
+company = st.text_input(
+    label="",
+    placeholder="e.g. O2Geeks",
+    label_visibility="collapsed"
+)
+# ---------------- Generate Blogs ---------------- #
+
+generate_btn = st.button(
+    "Generate Blogs",
+    use_container_width=True
+)
+
+if generate_btn:
+
+    if company.strip() == "":
+        st.warning("⚠ Please enter a company name.")
+        st.stop()
+    # ---------------- Company Analysis ---------------- #
+
+    with st.spinner("🔍 Analyzing Company..."):
+
+        company_info = analyze_company(company)
+
+    st.success("Company analysis completed successfully.")
+
+    with st.expander(" Company Analysis", expanded=False):
+
+        st.write(company_info)
+
+    st.divider()
+    # Generate Topics
+    with st.spinner("🤖 Generating Trending Topics..."):
+        topics = generate(extract_topics_prompt(company))
+
+    topic_list = [topic.strip() for topic in topics.split("\n") if topic.strip()]
+
+    st.success("Topics generated successfully.")
+    # ---------------- Dashboard Metrics ---------------- #
+
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        st.metric(
+            label=" Topics Generated",
+            value=len(topic_list)
+        )
+
+    with col2:
+        st.metric(
+            label=" Blogs Generated",
+            value=len(topic_list)
+        )
+
+    with col3:
+        st.metric(
+            label=" AI Model",
+            value="Gemma3:1b"
+        )
+
+    # ---------------- Topic Cards ---------------- #
+
+    st.markdown(
+    '<h2 class="section-heading">Suggested Topics</h2>',
+    unsafe_allow_html=True
+)
+
+    for i, topic in enumerate(topic_list, start=1):
+
+     st.markdown(
+        f"""
+        <div class="topic-card">
+            <span>{i:02}</span>
+            {topic}
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+    st.divider()
+ # ---------------- Blog Generation ---------------- #
+
+    st.markdown(
+    '<h2 class="section-heading">Generated Blogs</h2>',
+    unsafe_allow_html=True
+)
+
+    count = 1
+
+    for topic in topic_list:
+
+        with st.spinner(f"✍ Writing blog for '{topic}'..."):
+
+            blog = generate(blog_prompt(topic))
+
+        filepath = save_blog(f"blog{count}.txt", blog)
+        display_blog(
+            title=topic,
+            blog=blog,
+            filepath=filepath,
+            key=f"download_{count}"
+            )
+
+        count += 1
+
+    st.success(" All blogs generated and saved successfully!")
+
+    # ---------------- Download ZIP ---------------- #
+
+    zip_path = create_zip()
+
+    with open(zip_path, "rb") as file:
+
+        st.download_button(
+            label=" Download All Blogs ",
+            data=file,
+            file_name="AI_Blogs.zip",
+            mime="application/zip",
+            use_container_width=True
+        )
+
+
+
+   
